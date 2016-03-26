@@ -6,16 +6,20 @@ let xmlData = `<school id="100"><grade id="1"><classroom id="101" name="Mrs. Jon
 let cleanedDataArray = []
 
 
+
+
+
+// Input: <school id="100"/><grade id="1"/><classroom id="101" name="Mrs_Jones_Math Class"/><teacher id="10100000001" first_name="Barbara" last_name="Jones"/>
+// Output: [ [ { school_id: '100"' } ], [ { grade_id: '1"' } ], [ { classroom_id: '101"' }, { classroom_name: 'Mrs_Jones_Math Class"' } ]]
+
 const cleanXml = (data) => {
-
-
-  let makeObject = data.match(/<\s*([^\s>]+)([^>]*)\/\s*>/g);
-  for(var i = 0; i < makeObject.length; i++) {
+  let makeObject = data.match(/<[a-zA-Z]+((.(?!<\/)(?!<[a-zA-Z]+))*)?>/g);
+  for (var i = 0; i < makeObject.length; i++) {
     let arrayOfTagData = []
     let initialTag = makeObject[i].substring(0, makeObject[i].length - 2) + ">";
     let tagName = initialTag.match(/[^<][\w+$]+/)[0]
     let tagAttributes = initialTag.match(/(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/g);
-    for(var n = 0; n < tagAttributes.length; n++){
+    for (var n = 0; n < tagAttributes.length; n++) {
       let attribute = tagAttributes[n];
       let attributeName = attribute.substring(0, attribute.indexOf('='));
       let attributeValue = attribute.substring(attribute.indexOf('"') + 1, attribute.lastIndexOf('"') + 1);
@@ -26,31 +30,80 @@ const cleanXml = (data) => {
     }
     cleanedDataArray.push(arrayOfTagData)
   }
-  console.log(cleanedDataArray)
+  return cleanedDataArray
 }
+
+
+//////////////////// Input
+//[ [ { school_id: '100"' } ], [ { grade_id: '1"' } ], [ { classroom_id: '101"' }, { classroom_name: 'Mrs_Jones_Math Class"' } ]]
+////////////////// Output
+
+const organizeArrayObject = (data) => {
+  let arrayOfObjects = []
+
+  data.forEach(function(part) {
+    let buildObject = {}
+    part.forEach(function(object) {
+      let objectKey = Object.keys(object)[0]
+      let objectValue = object[objectKey]
+      buildObject[objectKey] = objectValue
+    })
+    arrayOfObjects.push(buildObject)
+
+
+  })
+  return arrayOfObjects
+}
+
+
+// input: [ [ { school_id: '100"' } ],[ { grade_id: '1"' } ], [ { classroom_id: '101"' },{ classroom_name: 'Mrs_Jones_Math Class"' } ]]
+//output: [ { school_id: '100"' }, { grade_id: '1"' }, { classroom_id: '101"', classroom_name: 'Mrs_Jones_Math Class"' }]
+
+const flattenArrayOfObjects = (data) => {
+  let unnestedArray = []
+  data.map(function(data) {
+    if (Array.isArray(data)) {
+      unnestedArray = unnestedArray.concat(flatten(data));
+    } else {
+      unnestedArray.push(data);
+    }
+  })
+  console.log(unnestedArray)
+}
+
+const consolidateStudentObjects = (data) => {
+
+}
+
+//runs data through necessary steps.
 
 const fixTagsOf = (data) => {
   data = cleanXml(data)
-
+  data = organizeArrayObject(data)
+  data = flattenArrayOfObjects(data)
+  data = consolidateStudentObjects(data)
   return data
 }
 
-
+//removes Doctype, ensures no edge cases in strings.
+//outputs uniform data to easily work with.
 const cleanThe = (data) => {
-  data = data.replace(/\<\?xml.+\?\>|\<\!DOCTYPE.+]\>/g, "")
+  data = data.replace(/('s\s)/g, "s_")
+    .replace(/\<\?xml.+\?\>|\<\!DOCTYPE.+]\>/g, "")
+    .replace(/\.\s/g, "_")
     .replace(/\t\r\n/g, "")
+    .replace(/\'\s\M/g, "_M")
     .replace(/\s+</g, "<")
-    .replace(/>\s+/g, ">");
-
+    .replace(/\"\>/g, '"/>')
+    .replace(/>\s+/g, ">")
   data = fixTagsOf(data)
-
   return data
 }
 
 
 const convertXml = (data) => {
   data = cleanThe(data)
-  // console.log(data)
+    // console.log(data)
   return data
 };
 
@@ -59,6 +112,11 @@ const convertXml = (data) => {
 
 
 
-jsonexport(convertXml(xmlData), {rowDelimeter: ','}, (err, csv) => {
+jsonexport(convertXml(xmlData), (err, csv) => {
+  if (err) console.log("err:", err)
+    // console.log(csv)
+    // fs.writeFile('newCSV.csv', csv, function(err, file){
+    //     console.log(err, file);
+    //   });
   console.log("nothing Broken")
 })
