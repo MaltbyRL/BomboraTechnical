@@ -1,0 +1,17 @@
+school_id,teacher_last_name,teacher_first_name,teacher_id,teacher_2_last_name,teacher_2_first_name,teacher_2_id,classroom_name,classroom_id,grade_id,student_last_name,student_first_name,student_id
+"100","Jones","Barbara","10100000001",x___,x___,x___,"Mrs_Jones_Math Class","101","1","Gil","Michael","10100000010"
+"100","Jones","Barbara","10100000001",x___,x___,x___,"Mrs_Jones_Math Class","101","1","Gutierrez","Kimberly","10100000011"
+"100","Jones","Barbara","10100000001",x___,x___,x___,"Mrs_Jones_Math Class","101","1","Mercado","Toby","10100000013"
+"100","Jones","Barbara","10100000001",x___,x___,x___,"Mrs_Jones_Math Class","101","1","Garcia","Lizzie","10100000014"
+"100","Jones","Barbara","10100000001",x___,x___,x___,"Mrs_Jones_Math Class","101","1","Cruz","Alex","10100000015"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","Smith","Nathaniel","10200000010"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","McCrancy","Brandon","10200000011"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","Marco","Elizabeth","10200000012"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","Lanni","Erica","10200000013"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","Flores","Michael","10200000014"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","Hill","Jasmin","10200000015"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","Perez","Brittany","10200000016"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","Hiram","William","10200000017"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","Reginald","Alexis","10200000018"
+"100","Smith","Arthur","10200000001","Patterson","John","10200000011","Mr_Smiths_PhysEd Class","102","1","Gayle","Matthew","10200000019"
+"100",x___,"Brian","10300000001",x___,x___,x___,"Brians_Homeroom","103","1",,,

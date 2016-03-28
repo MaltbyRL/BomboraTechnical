@@ -1,7 +1,11 @@
 "use strict";
-const jsonexport = require('jsonexport')
-const fs = require('fs')
-let xmlData;
+const jsonexport = require("jsonexport")
+const path = require('path');
+const fs = require("fs")
+const files = fs.readdirSync("./xml-to-be-converted");
+
+
+
 
 const consolidateStudentObjects = (data) => {
   let arrayOfFullStudentObjects = [];
@@ -9,70 +13,67 @@ const consolidateStudentObjects = (data) => {
   let studentObject = {};
   let counter = 0;
   let addTeacher = true;
+
   data.forEach(function(object, i) {
     if (object.hasOwnProperty("school_id")) {
-      school = {}
-      school["school_id"] = object["school_id"]
+      school = {
+        school_id: object["school_id"]
+      }
     } else if (object.hasOwnProperty("grade_id")) {
-      grade = {}
-      grade["grade_id"] = object["grade_id"]
-
+      grade = {
+        grade_id: object["grade_id"]
+      }
     } else if (object.hasOwnProperty("classroom_id")) {
-      classroom = {};
       addTeacher = true;
-
-      classroom["classroom_id"] = object["classroom_id"]
-      classroom["classroom_name"] = object["classroom_name"]
-      if (studentObject.hasOwnProperty("2nd_teacher_id")) {
-        console.log("hit")
-        teacherTwo = {};
-        teacherTwo["2nd_teacher_id"] = "";
-        teacherTwo["2nd_teacher_first_name"] = "";
-        teacherTwo["2nd_teacher_last_name"] = "";
+      classroom = {
+        classroom_id: object["classroom_id"],
+        classroom_name: object["classroom_name"]
       }
     } else if (object.hasOwnProperty("teacher_id")) {
       if (addTeacher) {
-        teacherOne = {}
-        teacherTwo = {}
         counter++
-        teacherOne["teacher_id"] = object["teacher_id"]
-        teacherOne["teacher_first_name"] = object["teacher_first_name"]
-        teacherOne["teacher_last_name"] = object["teacher_last_name"]
-        teacherTwo["2nd_teacher_id"] = "";
-        teacherTwo["2nd_teacher_first_name"] = "";
-        teacherTwo["2nd_teacher_last_name"] = "";
+        teacherOne = {
+          teacher_id: object["teacher_id"],
+          teacher_first_name: object["teacher_first_name"],
+          teacher_last_name: object["teacher_last_name"]
+        }
+        teacherTwo = {
+          teacher_2_id: "x___",
+          teacher_2_first_name: "x___",
+          teacher_2_last_name: "x___"
+        }
         addTeacher = false;
       } else {
-        teacherTwo = {}
-        teacherTwo["2nd_teacher_id"] = object["teacher_id"]
-        teacherTwo["2nd_teacher_first_name"] = object["teacher_first_name"]
-        teacherTwo["2nd_teacher_last_name"] = object["teacher_last_name"]
+        teacherTwo = {
+          teacher_2_id: object["teacher_id"],
+          teacher_2_first_name: object["teacher_first_name"],
+          teacher_2_last_name: object["teacher_last_name"]
+        }
       }
     }
-    if (object.hasOwnProperty("student_id") || counter === 3){
-
-      studentObject = {}
-      studentObject["grade_id"] = grade["grade_id"]
-      studentObject["classroom_id"] = classroom["classroom_id"]
-      studentObject["classroom_name"] = classroom["classroom_name"]
-      studentObject["teacher_2_id"] = teacherTwo["2nd_teacher_id"]
-      studentObject["teacher_2_first_name"] = teacherTwo["2nd_teacher_first_name"]
-      studentObject["teacher_2_last_name"] = teacherTwo["2nd_teacher_last_name"]
-      studentObject["teacher_id"] = teacherOne["teacher_id"]
-      studentObject["teacher_first_name"] = teacherOne["teacher_first_name"]
-      studentObject["teacher_last_name"] = teacherOne["teacher_last_name"]
-      studentObject["school_id"] = school["school_id"]
-      studentObject["student_id"] = object["student_id"]
-      studentObject["student_first_name"] = object["student_first_name"]
-      studentObject["student_last_name"] = object["student_last_name"]
-      console.log(">>>",studentObject)
-      arrayOfFullStudentObjects.push(studentObject)
-    }
+      if (object.hasOwnProperty("student_id") || counter === 3) {
+        studentObject = {
+          grade_id: grade["grade_id"],
+          classroom_id: classroom["classroom_id"],
+          classroom_name: classroom["classroom_name"],
+          teacher_2_id: teacherTwo["teacher_2_id"],
+          teacher_2_first_name: teacherTwo["teacher_2_first_name"],
+          teacher_2_last_name: teacherTwo["teacher_2_last_name"],
+          teacher_id: teacherOne["teacher_id"],
+          teacher_first_name: teacherOne["teacher_first_name"],
+          teacher_last_name: (teacherOne["teacher_last_name"] !== '"') ? teacherOne["teacher_last_name"] : "x___",
+          school_id: school["school_id"],
+          student_id: object["student_id"],
+          student_first_name: object["student_first_name"],
+          student_last_name: object["student_last_name"]
+        }
+        console.log(">>>", studentObject)
+        arrayOfFullStudentObjects.push(studentObject)
+      }
   })
-  console.log("<<<<<", arrayOfFullStudentObjects)
-  // console.log(">>>>", arrayOfFullStudentObjects)
   return arrayOfFullStudentObjects
 }
+
 
 // Input: [ [ { school_id: '100"' } ],[ { grade_id: '1"' } ], [ { classroom_id: '101"' },{ classroom_name: 'Mrs_Jones_Math Class"' } ]]
 // Output: [ { school_id: '100"' }, { grade_id: '1"' }, { classroom_id: '101"', classroom_name: 'Mrs_Jones_Math Class"' }]
@@ -117,7 +118,7 @@ const cleanXml = (data) => {
     for (var n = 0; n < tagAttributes.length; n++) {
       let attribute = tagAttributes[n];
       let attributeName = attribute.substring(0, attribute.indexOf('='));
-      let attributeValue = attribute.substring(attribute.indexOf('"') + 1, attribute.lastIndexOf('"') + 1);
+      let attributeValue = attribute.substring(attribute.indexOf('"'), attribute.lastIndexOf('"') + 1);
       let objectKey = tagName + "_" + attributeName
       let object = {}
       object[objectKey] = attributeValue;
@@ -153,20 +154,24 @@ const convertXml = (data) => {
   return data
 }
 
-fs.readFile('./xml-to-be-converted/sample_data.xml', function read(err, data) {
-  if (err) {
-    console.log("err")
-    throw err;
-  }
-  xmlData = data.toString('utf8');
-  console.log(xmlData)
-
-  jsonexport(convertXml(xmlData), (err, csv) => {
-    if (err) console.log("err:", err)
-    console.log(csv)
-    fs.writeFile('converted-to-csv/RichardsCSV.csv', csv, function(err, file) {
-      console.log(err, file);
+for (var i in files) {
+  if (path.extname(files[i]) === ".xml") {
+    let xmlFile = "./xml-to-be-converted/" + files[i]
+    fs.readFile(xmlFile, function read(err, data) {
+      if (err) {
+        console.log("err", err)
+        throw err;
+      }
+      let xmlData = data.toString('utf8');
+      jsonexport(convertXml(xmlData), (err, csv) => {
+        if (err) console.log("err:", err)
+        console.log(csv)
+        fs.writeFile("converted-to-csv/Richard.csv", csv, function(err, file) {
+          console.log(err, file);
+        });
+        console.log("nothing Broken")
+      })
     });
-    console.log("nothing Broken")
-  })
-});
+
+  }
+}
